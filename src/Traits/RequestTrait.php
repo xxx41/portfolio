@@ -16,7 +16,7 @@ trait RequestTrait
         return $request->query->all();
     }
 
-    protected function getParam(Request $request, $param)
+    protected function getParam(Request $request, string $param)
     {
         return $request->query->get($param);
     }

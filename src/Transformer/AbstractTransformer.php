@@ -15,12 +15,12 @@ class AbstractTransformer implements TransformerInterface
 
     public function getAttributes() {}
 
-    public function transform(array $objects)
+    public function transform(array $objects): array
     {
         return $this->transformEntities($objects, $this->getAttributes() ?? []);
     }
 
-    protected function transformEntities($objects, array $keyList)
+    protected function transformEntities($objects, array $keyList): array
     {
         $result = [];
         foreach ($objects as $index => $object) {
@@ -32,7 +32,7 @@ class AbstractTransformer implements TransformerInterface
         return $result;
     }
 
-    private function getAttribute($key, $object)
+    private function getAttribute($key, $object): ?string
     {
         $methodString = 'get' . ucfirst($key);
         return (method_exists($this->entity, $methodString))

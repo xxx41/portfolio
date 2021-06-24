@@ -11,7 +11,7 @@ class EntryTransformer extends AbstractTransformer
         parent::__construct(Entry::class);
     }
 
-    public function getAttributes()
+    public function getAttributes(): array
     {
         return [
             'id',

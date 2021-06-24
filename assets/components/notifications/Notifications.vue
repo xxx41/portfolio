@@ -1,35 +1,35 @@
 <template>
     <div class="notifications">
-        <v-snackbar
-            v-model="snackbar"
-            :timeout="-1"
-            top
-            transition="scroll-y-transition"
+        <v-alert
+            border="left"
+            dense
+            outlined
+            type="success"
             dismissible
-        >
-            <v-alert
-                border="left"
-                dense
-                text
-                type="success"
-                transition="scale-transition"
-                v-if="success.status"
-            >{{ success.message }}</v-alert>
-            <v-alert
-                border="left"
-                dense
-                text
-                type="warning"
-                v-if="warning.status"
-            >{{ warning.message }}</v-alert>
-            <v-alert
-                border="left"
-                dense
-                text
-                type="error"
-                v-if="error.status"
-            >{{ error.message }}</v-alert>
-        </v-snackbar>
+            class="notifications__alert"
+            transition="slide-y-transition"
+            v-if="alertTypes.success.status"
+        >{{ alertTypes.success.message }}</v-alert>
+        <v-alert
+            border="left"
+            dense
+            outlined
+            type="warning"
+            dismissible
+            class="notifications__alert"
+            transition="slide-y-transition"
+            v-if="alertTypes.warning.status"
+        >{{ alertTypes.warning.message }}</v-alert>
+        <v-alert
+            border="left"
+            dense
+            outlined
+            type="error"
+            dismissible
+            class="notifications__alert"
+            transition="slide-y-transition"
+            v-if="alertTypes.error.status"
+        >{{ alertTypes.error.message }}</v-alert>
     </div>
 </template>
 
@@ -39,44 +39,39 @@ import EventBus from '../../bus';
 export default {
     name: 'notifications',
 
-    components: { },
-
-    props: {
-
-    },
-
     data() {
         return {
-            success: { status: false, message: undefined },
-            warning: { status: false, message: undefined },
-            error: { status: false, message: undefined },
-        }
-    },
-
-    computed: {
-        snackbar() {
-            return this.success.status || this.warning.status || this.error.status;
+            alertTimeout: 8000,
+            alertTypes: {
+                success: { status: false, message: undefined },
+                warning: { status: false, message: undefined },
+                error: { status: false, message: undefined },
+            },
         }
     },
 
     mounted() {
-        EventBus.$on('notification:success', () => {
-            console.log('notification:success');
-        });
-
-        EventBus.$on('notification:warning', () => {
-            console.log('notification:warning');
-        });
-
-        EventBus.$on('notification:error', (message) => {
-            console.log('notification:error');
-            this.error.status = true;
-            this.error.message = message;
-        });
+        for (const type in this.alertTypes) {
+            this.setEventBusListeners(type)
+        }
     },
 
     methods: {
+        setEventBusListeners(type) {
+            EventBus.$on(`notification:${type}`, (message) => {
+                this.alertTypes[type].status = true;
+                this.alertTypes[type].message = message;
 
+                this.hideAndResetAfterTimeout(this.alertTypes[type]);
+            });
+        },
+
+        hideAndResetAfterTimeout(target) {
+            setTimeout(() => {
+                target.status = false;
+                target.message = undefined;
+            }, this.alertTimeout);
+        }
     }
 }
 </script>

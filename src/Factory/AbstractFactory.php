@@ -68,5 +68,4 @@ abstract class AbstractFactory
 
         return $this->response;
     }
-
 }

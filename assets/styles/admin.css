@@ -1,0 +1,13 @@
+.notifications {
+    position: absolute;
+    top: 30px;
+    z-index: 99;
+    background: #333333;
+    width: 75%;
+    border-radius: 4px;
+    left: 12.5%;
+}
+
+.notifications__alert {
+    margin: 0;
+}

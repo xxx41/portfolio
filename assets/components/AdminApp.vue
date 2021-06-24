@@ -1,17 +1,10 @@
 <template>
     <v-app id="inspire">
-        <notifications></notifications>
         <v-app-bar
             app
             flat
         >
             <v-container class="py-0 fill-height">
-                <!-- <v-avatar
-                    class="mr-10"
-                    color="grey darken-1"
-                    size="32"
-                ></v-avatar> -->
-
                 <v-btn
                     v-for="(link, index) in links"
                     :key="index"
@@ -35,8 +28,10 @@
             </v-container>
         </v-app-bar>
 
+        <notifications></notifications>
+
         <v-main class="grey lighten-3">
-            <router-view></router-view>
+            <router-view :key="$route.fullPath"></router-view>
         </v-main>
     </v-app>
 </template>}
