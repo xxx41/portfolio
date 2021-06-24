@@ -79,7 +79,8 @@ Encore
     .addPlugin(new VuetifyLoaderPlugin())
 
     .addAliases({
-        '@Providers': path.resolve(__dirname, './assets/providers')
+        '@Providers': path.resolve(__dirname, './assets/providers'),
+        '@Events': path.resolve(__dirname, './assets/events')
     })
 ;
 

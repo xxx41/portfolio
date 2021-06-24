@@ -32,7 +32,7 @@ class AbstractTransformer implements TransformerInterface
         return $result;
     }
 
-    private function getAttribute($key, $object): ?string
+    private function getAttribute($key, $object)
     {
         $methodString = 'get' . ucfirst($key);
         return (method_exists($this->entity, $methodString))

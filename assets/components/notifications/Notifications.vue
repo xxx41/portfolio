@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import EventBus from '../../bus';
+import NotificationBus from '@Events/NotificationBus';
 
 export default {
     name: 'notifications',
@@ -51,19 +51,22 @@ export default {
     },
 
     mounted() {
-        for (const type in this.alertTypes) {
-            this.setEventBusListeners(type)
-        }
+        this.addNotificationListeners();
     },
 
     methods: {
-        setEventBusListeners(type) {
-            EventBus.$on(`notification:${type}`, (message) => {
-                this.alertTypes[type].status = true;
-                this.alertTypes[type].message = message;
+        addNotificationListeners() {
+            NotificationBus.onSuccess((message) => this.listenerCallback('success', message));
+            NotificationBus.onWarning((message) => this.listenerCallback('warning', message));
+            NotificationBus.onError((message) => this.listenerCallback('error', message));
+        },
 
-                this.hideAndResetAfterTimeout(this.alertTypes[type]);
-            });
+
+        listenerCallback(type, message) {
+            this.alertTypes[type].status = true;
+            this.alertTypes[type].message = message;
+
+            this.hideAndResetAfterTimeout(this.alertTypes[type]);
         },
 
         hideAndResetAfterTimeout(target) {

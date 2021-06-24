@@ -4,6 +4,7 @@
             :headers="headers"
             :items="entries"
             item-key="name"
+            :loading="loadingTable"
             class="elevation-1"
             >
             <template v-slot:top>
@@ -44,12 +45,14 @@
 
 <script>
 import EntryFacade from '@Providers/EntryFacade';
+import NotificationBus from '@Events/NotificationBus';
 
 export default {
     data: () => ({
         entries: undefined,
         dialogDelete: false,
-        toDeleteIndex: undefined
+        toDeleteIndex: undefined,
+        loadingTable: false
     }),
 
     watch: {
@@ -76,30 +79,31 @@ export default {
     },
 
     methods: {
-        getAllEntries() {
-            EntryFacade.findAll()
+        async getAllEntries() {
+            this.loadingTable = true
+            await EntryFacade.findAll()
                 .then(response => {
                     this.entries = response.data;
                 })
                 .catch(error => {
-                    // TODO: show error message getting entries
-                    console.log(error);
-                })
+                    NotificationBus.addError(`Error loading entries: ${error.message}`);
+                });
+            this.loadingTable = false;
         },
 
         deleteItemConfirm() {
             const entryId = this.entries[this.toDeleteIndex].id;
             EntryFacade.deleteEntry({ entryId: entryId })
-                .then(response => {
+                .then(() => {
                     this.entries.splice(this.toDeleteIndex, 1);
                     this.toDeleteIndex = undefined;
                     this.dialogDelete = false;
+                    NotificationBus.addSuccess('Entry deleted successfully');
                 })
                 .catch(error => {
-                    // TODO: show error message deleting entry
-                    console.log(error);
                     this.toDeleteIndex = undefined;
                     this.dialogDelete = false;
+                    NotificationBus.addSuccess(`Error deleting entry; ${error.message}`);
                 });
 
         },

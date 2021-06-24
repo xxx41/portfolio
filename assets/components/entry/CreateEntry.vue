@@ -12,7 +12,7 @@
 <script>
 import EntryFacade from '@Providers/EntryFacade';
 import Wysiwyg from '../wysiwyg/Wysiwyg';
-import EventBus from '../../bus';
+import NotificationBus from '@Events/NotificationBus';
 
 export default {
     name: 'create-entry',
@@ -52,7 +52,8 @@ export default {
 
         createEntry(entry) {
             EntryFacade.createEntry({ fields: this.getFieldsValueObject(entry.fields) })
-                .then(response => {
+                .then(() => {
+                    NotificationBus.addSuccess('Entry created successfully');
                     this.$router.push('entries');
                 })
                 .catch(error => {
@@ -65,11 +66,12 @@ export default {
                 id: entry.id,
                 fields: this.getFieldsValueObject(entry.fields)
             })
-                .then(response => {
+                .then(() => {
+                    NotificationBus.addSuccess('Entry edited successfully');
                     this.$router.push('entries');
                 })
                 .catch(error => {
-                    EventBus.$emit('notification:error', error.response.data);
+                    NotificationBus.addError(error.response.data);
                 })
         },
 
