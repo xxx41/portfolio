@@ -3,11 +3,12 @@
 namespace App\Controller\Api;
 
 use App\Factory\EntryFactory;
-use App\Helper\Helper;
 use App\Traits\ApiTrait;
+use App\Traits\RequestTrait;
 use App\Transformer\EntryTransformer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -16,6 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class EntryController extends AbstractController
 {
     use ApiTrait;
+    use RequestTrait;
 
     private $entryFactory;
 
@@ -27,24 +29,56 @@ class EntryController extends AbstractController
     /**
      * @Route("/find-all", name="find_all", methods={"GET"})
      */
-    public function getEntry(
-        EntryTransformer $entryTransformer
-    )
+    public function getEntry(EntryTransformer $entryTransformer): Response
     {
         $data = $this->entryFactory->getAll(['createdAt' => 'DESC']);
         $data = $entryTransformer->transform($data);
 
-        return ($data) ? $this->okResponse($data) : $this->notFoundResponse();
+        return $this->okResponse($data);
     }
 
     /**
-     * @Route("/save", name="save", methods={"PUT"})
+     * @Route("/create", name="create", methods={"PUT"})
      */
-    public function saveEntry(Request $request)
+    public function createEntry(Request $request): Response
     {
-        $data = Helper::getDecodedContent($request);
-        $this->entryFactory->create($data);
+        $data = $this->getContent($request);
+        $created = $this->entryFactory->create($data['fields']);
+
+        if (!empty($created->hasErrors())) {
+            return $this->badRequestResponse($created->getFirstError());
+        }
 
         return $this->okResponse();
+    }
+
+    /**
+     * @Route("/edit", name="edit", methods={"PUT"})
+     */
+    public function editEntry(Request $request): Response
+    {
+        $data = $this->getContent($request);
+        $edited = $this->entryFactory->edit($data['id'], $data['fields']);
+
+        if (!empty($edited->hasErrors())) {
+            return $this->badRequestResponse($edited->getFirstError());
+        }
+
+        return $this->okResponse();
+    }
+
+    /**
+     * @Route("/delete", name="delete", methods={"DELETE"})
+     */
+    public function deleteEntry(Request $request): Response
+    {
+        $entryId = $this->getParam($request, 'entryId');
+        $deleted = $this->entryFactory->remove($entryId);
+
+        if (!empty($deleted->hasErrors())) {
+            return $this->badRequestResponse($deleted->getFirstError());
+        }
+
+        return $this->noContentResponse();
     }
 }

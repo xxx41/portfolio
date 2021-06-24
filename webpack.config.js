@@ -79,7 +79,7 @@ Encore
     .addPlugin(new VuetifyLoaderPlugin())
 
     .addAliases({
-        '@Facade': path.resolve(__dirname, './assets/facade')
+        '@Providers': path.resolve(__dirname, './assets/providers')
     })
 ;
 

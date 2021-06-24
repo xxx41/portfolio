@@ -29,8 +29,8 @@ const routes = [
         },
         children: [
             { name: 'entries', path: '/entries', component: Entries },
-            { name: 'add-entry', path: '/add-entry', component: CreateEntry, props: { edit: false } },
-            { name: 'edit-entry', path: '/edit-entry', component: CreateEntry, props: { edit: true } },
+            { name: 'add-entry', path: '/add-entry', component: CreateEntry, props: { isEditMode: false } },
+            { name: 'edit-entry', path: '/edit-entry', component: CreateEntry, props: { isEditMode: true, entry: undefined } },
         ]
     },
 ];

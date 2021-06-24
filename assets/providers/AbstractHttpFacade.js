@@ -12,22 +12,23 @@ class AbstractHttpFacade {
 
     doGet(path, config) {
         const request = axios.get(path, config);
-        return request.then(response => response).catch(error => error);
+        return request;
     }
 
     async doPost(path, data, config) {
         const request = axios.post(path, data, config);
-        return request.then(response => response).catch(error => error);
+        return request;
     }
 
     async doPut(path, data, config) {
         const request = axios.put(path, data, config);
-        return request.then(response => response).catch(error => error);
+        return request;
     }
 
-    async doDelete(path, config) {
+    async doDelete(path, params, config) {
+        path = this.buildQueryParams(path, params);
         const request = axios.delete(path, config);
-        return request.then(response => response).catch(error => error);
+        return request;
     }
 
     buildRoutes(routes, base) {
@@ -36,6 +37,14 @@ class AbstractHttpFacade {
         }
 
         return routes;
+    }
+
+    buildQueryParams(path, params) {
+        let queryParams = [];
+        for (const key in params) {
+            queryParams.push(encodeURIComponent(key) + "=" + encodeURIComponent(params[key]));
+        }
+        return `${path}?${queryParams.join('&')}`;
     }
 }
 

@@ -16,11 +16,11 @@ class EntryFactory extends AbstractFactory
         parent::__construct($entryRepository, $entityManager);
     }
 
-    protected function createEntity($attributes)
+    protected function saveEntity(array $attributes, Entry $entity = null): Entry
     {
         $attributesProcessed = $this->processAttributes($attributes);
 
-        $entry = new Entry();
+        $entry = (!$entity) ? new Entry() : $entity;
         $entry->setTitle($attributesProcessed['title']);
         $entry->setContent($attributesProcessed['content']);
         $entry->setPath($attributesProcessed['path']);
@@ -28,7 +28,7 @@ class EntryFactory extends AbstractFactory
         return $entry;
     }
 
-    private function processAttributes($attributes)
+    private function processAttributes(array $attributes): array
     {
         return [
             'title' => $attributes['title'],
@@ -37,8 +37,9 @@ class EntryFactory extends AbstractFactory
         ];
     }
 
-    private function buildPath($string)
+    private function buildPath($string): string
     {
+        // TODO: remove not allowed chars
         return str_replace(" ", "-", strtolower($string));
     }
 }

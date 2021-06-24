@@ -19,7 +19,7 @@
                         <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-                        <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+                        <v-btn color="blue darken-1" text @click="deleteItemConfirm($event.target)">OK</v-btn>
                         <v-spacer></v-spacer>
                         </v-card-actions>
                     </v-card>
@@ -29,14 +29,12 @@
                 <v-row>
                     <v-icon
                         class="mr-2"
-                        @click="editItem(item)"
-                    >
-                        mdi-pencil
+                        @click="editEntry(entry)"
+                    >mdi-pencil
                     </v-icon>
                     <v-icon
-                        @click="deleteItem(item)"
-                    >
-                        mdi-delete
+                        @click="deleteEntry(item)"
+                    >mdi-delete
                     </v-icon>
                 </v-row>
             </template>
@@ -45,12 +43,13 @@
 </template>
 
 <script>
-import EntryFacade from '@Facade/EntryFacade';
+import EntryFacade from '@Providers/EntryFacade';
 
 export default {
     data: () => ({
         entries: undefined,
-        dialogDelete: false
+        dialogDelete: false,
+        toDeleteIndex: undefined
     }),
 
     watch: {
@@ -83,20 +82,35 @@ export default {
                     this.entries = response.data;
                 })
                 .catch(error => {
+                    // TODO: show error message getting entries
                     console.log(error);
                 })
         },
 
-        editItem() {
-
-        },
-
-        deleteItem() {
-            this.dialogDelete = true
-        },
-
         deleteItemConfirm() {
+            const entryId = this.entries[this.toDeleteIndex].id;
+            EntryFacade.deleteEntry({ entryId: entryId })
+                .then(response => {
+                    this.entries.splice(this.toDeleteIndex, 1);
+                    this.toDeleteIndex = undefined;
+                    this.dialogDelete = false;
+                })
+                .catch(error => {
+                    // TODO: show error message deleting entry
+                    console.log(error);
+                    this.toDeleteIndex = undefined;
+                    this.dialogDelete = false;
+                });
 
+        },
+
+        editEntry(entry) {
+            this.$router.push({ name: 'edit-entry', params: { entry: entry }});
+        },
+
+        deleteEntry(entry) {
+            this.toDeleteIndex = this.entries.indexOf(entry);
+            this.dialogDelete = true
         },
 
         closeDelete () {

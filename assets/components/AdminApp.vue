@@ -1,5 +1,6 @@
 <template>
     <v-app id="inspire">
+        <notifications></notifications>
         <v-app-bar
             app
             flat
@@ -41,11 +42,15 @@
 </template>}
 
 <script>
+    import Notifications from './notifications/Notifications';
+
     export default {
+        components: { Notifications },
+
         data: () => ({
             links: [
                 {name: 'Dashboard', path: '/dashboard'},
-                {name: 'Entry', path: '/entry'}
+                {name: 'Blog', path: '/entry'}
             ]
         }),
     }

@@ -2,21 +2,17 @@
     <div class="create-entry">
         <wysiwyg
             :entry-to-edit="entry"
-            :edit="edit"
+            :is-edit-mode="isEditMode"
             :entries="entries"
-            v-on:entry-edited="entryEdited">
+            v-on:entry-edited="saveEntry">
         </wysiwyg>
-        <v-btn
-            color="primary"
-            elevation="6"
-            @click="saveEntry"
-        >Save</v-btn>
     </div>
 </template>
 
 <script>
-import EntryFacade from '@Facade/EntryFacade';
+import EntryFacade from '@Providers/EntryFacade';
 import Wysiwyg from '../wysiwyg/Wysiwyg';
+import EventBus from '../../bus';
 
 export default {
     name: 'create-entry',
@@ -24,7 +20,7 @@ export default {
     components: { Wysiwyg },
 
     props: {
-        edit: {
+        isEditMode: {
             type: Boolean,
             default: false
         },
@@ -37,13 +33,25 @@ export default {
         }
     },
 
-    mounted() {},
+    created() {
+        if (this.isEditMode && !this.entry) {
+            this.getAllEntries();
+        }
+    },
+
+    mounted() {
+        this.$on('')
+    },
 
     methods: {
-        saveEntry() {
+        saveEntry(entry) {
             //TODO: validate data
 
-            EntryFacade.saveEntry(this.getEntryData())
+            (entry.id) ? this.editEntry(entry) : this.createEntry(entry);
+        },
+
+        createEntry(entry) {
+            EntryFacade.createEntry({ fields: this.getFieldsValueObject(entry.fields) })
                 .then(response => {
                     this.$router.push('entries');
                 })
@@ -52,16 +60,33 @@ export default {
                 })
         },
 
-        entryEdited(payload) {
-            this.entry = payload;
+        editEntry(entry) {
+            EntryFacade.editEntry({
+                id: entry.id,
+                fields: this.getFieldsValueObject(entry.fields)
+            })
+                .then(response => {
+                    this.$router.push('entries');
+                })
+                .catch(error => {
+                    EventBus.$emit('notification:error', error.response.data);
+                })
         },
 
-        getEntryData() {
-            return {
-                title: this.entry.title.value,
-                content: this.entry.content.value
-            }
-        }
+        getFieldsValueObject(fields) {
+            return { title: fields.title.value, content: fields.content.value };
+        },
+
+        getAllEntries() {
+            EntryFacade.findAll()
+                .then(response => {
+                    this.entries = response.data;
+                })
+                .catch(error => {
+                    // TODO: show error message getting entries
+                    console.log(error);
+                })
+        },
     }
 }
 </script>

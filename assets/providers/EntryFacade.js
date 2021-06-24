@@ -3,7 +3,9 @@ import AbstractHttpFacade from "./AbstractHttpFacade";
 const basePath = '/entry'
 const routes = {
     findAll: '/find-all',
-    save: '/save'
+    create: '/create',
+    edit: '/edit',
+    delete: '/delete'
 }
 
 class EntryFacade extends AbstractHttpFacade {
@@ -16,8 +18,16 @@ class EntryFacade extends AbstractHttpFacade {
         return this.doGet(routes.findAll);
     }
 
-    saveEntry(data) {
-        return this.doPut(routes.save, data)
+    createEntry({fields}) {
+        return this.doPut(routes.create, { fields })
+    }
+
+    editEntry({id, fields}) {
+        return this.doPut(routes.edit, { id, fields })
+    }
+
+    deleteEntry(entryId) {
+        return this.doDelete(routes.delete, entryId);
     }
 
 }
